@@ -7,11 +7,15 @@ Task of the students: explore approaches to model ensemble construction for sema
 - Csapat: Solo
 - JGOB5J - Pongrácz Ádám
 
-## Adathalmaz:
+## Adathalmaz ACDC:
+A házi feladat elkészítéséhez a 2017-es MICCAI kihíváshoz készűlt ACDC adathalmazt választottam. Ez a kihívás szív MR képek szegmentálásával foglalkozik. Bővebb információ az adathalmazról a következő linken érhető el: https://acdc.creatis.insa-lyon.fr/
 
-## Fájlok és futtatás 
+Az adathalmaz a következő oldaltól tölthető le: [ACDC](https://humanheart-project.creatis.insa-lyon.fr/database/#collection/637218c173e9f0047faa00fb/folder/637218e573e9f0047faa00fc)
 
-## Referenciák 
+## Fájlok és futtatás
+MedImgEnsemble_DataPrep.ipynb: A notebook tartalmazza az adathalmaz letöltését és az adatok előkészítését. 
+
+## Referenciák
 
 ### Related GitHub repositories:
 - [divergent-nets](https://github.com/vlbthambawita/divergent-nets)
