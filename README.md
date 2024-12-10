@@ -7,13 +7,20 @@ Task of the students: explore approaches to model ensemble construction for sema
 - Csapat: Solo
 - JGOB5J - Pongrácz Ádám
 
-## Adathalmaz ACDC:
-A házi feladat elkészítéséhez a 2017-es MICCAI kihíváshoz készűlt ACDC adathalmazt választottam. Ez a kihívás szív MR képek szegmentálásával foglalkozik. Bővebb információ az adathalmazról a következő linken érhető el: https://acdc.creatis.insa-lyon.fr/
+## Adathalmaz Kvasir SEG:
 
-Az adathalmaz a következő oldaltól tölthető le: [ACDC](https://humanheart-project.creatis.insa-lyon.fr/database/#collection/637218c173e9f0047faa00fb/folder/637218e573e9f0047faa00fc)
+
+Az adathalmaz a következő oldaltól tölthető le: [Kvasir SEG](https://datasets.simula.no/kvasir-seg/)
 
 ## Fájlok és futtatás
-MedImgEnsemble_DataPrep.ipynb: A notebook tartalmazza az adathalmaz letöltését és az adatok előkészítését. 
+- data:
+  - kvasir_seg_datamodule.py
+  - kvasir_seg_dataset.py
+- eval
+- gradio
+- model
+- train
+- trained_models
 
 ## Referenciák
 
