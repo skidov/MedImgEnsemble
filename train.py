@@ -7,7 +7,9 @@ from lightning.pytorch.loggers import WandbLogger
 import wandb
 from data.kvasir_seg_datamodule import KvasirSEGDataModule
 from model.model_baseline import ModelBaseline
+from model.model_ensemble import ModelEnsemble
 from model.model_fcn import ModelFCN
+from model.model_tri_unet import ModelTriUNet
 from model.model_unet import ModelUNet
 
 
@@ -16,11 +18,7 @@ def train_model(data_module, model, name, max_epoch=40):
     early_stop_callback = EarlyStopping(monitor="val_loss", mode="min", patience=2, verbose=False)
     wandb_logger = WandbLogger(name=name, project="kvasir_segmentation", log_model="all")
 
-    trainer = L.Trainer(
-        callbacks=[checkpoint_callback, early_stop_callback],
-        logger=wandb_logger,
-        max_epochs=max_epoch,
-    )
+    trainer = L.Trainer(callbacks=[checkpoint_callback, early_stop_callback], logger=wandb_logger, max_epochs=max_epoch, deterministic=True)
 
     trainer.fit(model, data_module)
     trainer.test(model, dataloaders=data_module.test_dataloader())
@@ -40,7 +38,7 @@ def train_baseline(max_epoch=40, batch_size=64, lr=3e-4):
     return train_model(data_module, model, name, max_epoch)
 
 
-def train_fcn(max_epoch=40, batch_size=16, lr=3e-4):
+def train_fcn(max_epoch=40, batch_size=6, lr=3e-4):
     data_module = KvasirSEGDataModule(batch_size=batch_size)
     model = ModelFCN(lr=lr)
 
@@ -49,10 +47,28 @@ def train_fcn(max_epoch=40, batch_size=16, lr=3e-4):
     return train_model(data_module, model, name, max_epoch)
 
 
-def train_unet(max_epoch=40, batch_size=16, lr=3e-4):
+def train_unet(max_epoch=40, batch_size=32, lr=3e-4):
     data_module = KvasirSEGDataModule(batch_size=batch_size)
     model = ModelUNet(lr=lr)
 
     name = f"unet_{datetime.datetime.now().strftime('%y%m%d%H%M')}"
+
+    return train_model(data_module, model, name, max_epoch)
+
+
+def train_tri_unet(max_epoch=40, batch_size=16, lr=3e-4):
+    data_module = KvasirSEGDataModule(batch_size=batch_size)
+    model = ModelTriUNet(lr=lr)
+
+    name = f"tri_unet_{datetime.datetime.now().strftime('%y%m%d%H%M')}"
+
+    return train_model(data_module, model, name, max_epoch)
+
+
+def train_ensemble(max_epoch=40, batch_size=5, lr=3e-4):
+    data_module = KvasirSEGDataModule(batch_size=batch_size)
+    model = ModelEnsemble(lr=lr)
+
+    name = f"ensemble_{datetime.datetime.now().strftime('%y%m%d%H%M')}"
 
     return train_model(data_module, model, name, max_epoch)
