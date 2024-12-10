@@ -2,8 +2,7 @@ import lightning as L
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchmetrics import Dice, JaccardIndex
-from torchmetrics.classification import BinaryAccuracy
+from torchmetrics.segmentation import DiceScore
 
 from model.metrics import DiceLoss
 
@@ -40,7 +39,7 @@ class ModelFCN(L.LightningModule):
         )
 
         self.criterion = DiceLoss()
-        self.dice = Dice()
+        self.dice = DiceScore(num_classes=2)
 
     def forward(self, x):
         x = self.layer_0(x)
@@ -63,7 +62,7 @@ class ModelFCN(L.LightningModule):
         mask = batch[1].unsqueeze(1)
 
         loss = self.criterion(pred_mask, mask)
-        dice = self.dice(pred_mask, mask.type(torch.uint8))
+        dice = 1 - loss
 
         self.log("train_loss", loss, on_epoch=True)
         self.log("train_dice", dice, on_epoch=True)
@@ -74,7 +73,7 @@ class ModelFCN(L.LightningModule):
         mask = batch[1].unsqueeze(1)
 
         loss = self.criterion(pred_mask, mask)
-        dice = self.dice(pred_mask, mask.type(torch.uint8))
+        dice = 1 - loss
 
         self.log("val_loss", loss, prog_bar=True)
         self.log("val_dice", dice, prog_bar=True)
@@ -85,7 +84,7 @@ class ModelFCN(L.LightningModule):
         mask = batch[1].unsqueeze(1)
 
         loss = self.criterion(pred_mask, mask)
-        dice = self.dice(pred_mask, mask.type(torch.uint8))
+        dice = 1 - loss
 
         self.log("test_loss", loss)
         self.log("test_dice", dice)
