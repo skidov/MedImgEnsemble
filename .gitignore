@@ -166,3 +166,4 @@ trained_models/
 lightning_logs/
 wandb/
 kvasir_segmentation/
+images/
