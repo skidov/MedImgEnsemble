@@ -13,9 +13,9 @@ from model.model_tri_unet import ModelTriUNet
 from model.model_unet import ModelUNet
 
 
-def train_model(data_module, model, name, max_epoch=40):
+def train_model(data_module, model, name, max_epoch=100):
     checkpoint_callback = ModelCheckpoint()
-    early_stop_callback = EarlyStopping(monitor="val_loss", mode="min", patience=2, verbose=False)
+    early_stop_callback = EarlyStopping(monitor="val_loss", mode="min", patience=5, verbose=False)
     wandb_logger = WandbLogger(name=name, project="kvasir_segmentation", log_model="all")
 
     trainer = L.Trainer(callbacks=[checkpoint_callback, early_stop_callback], logger=wandb_logger, max_epochs=max_epoch, deterministic=True)
@@ -29,7 +29,19 @@ def train_model(data_module, model, name, max_epoch=40):
     return name
 
 
-def train_baseline(max_epoch=40, batch_size=64, lr=3e-4):
+def eval_model(data_module, model, name):
+    wandb_logger = WandbLogger(name=name, project="kvasir_segmentation", log_model="all")
+
+    trainer = L.Trainer(logger=wandb_logger, deterministic=True)
+
+    trainer.test(model, dataloaders=data_module.test_dataloader())
+
+    wandb.finish()
+
+    return name
+
+
+def train_baseline(max_epoch=100, batch_size=64, lr=3e-4):
     data_module = KvasirSEGDataModule(batch_size=batch_size)
     model = ModelBaseline(lr=lr)
 
@@ -38,7 +50,7 @@ def train_baseline(max_epoch=40, batch_size=64, lr=3e-4):
     return train_model(data_module, model, name, max_epoch)
 
 
-def train_fcn(max_epoch=40, batch_size=6, lr=3e-4):
+def train_fcn(max_epoch=100, batch_size=5, lr=3e-4):
     data_module = KvasirSEGDataModule(batch_size=batch_size)
     model = ModelFCN(lr=lr)
 
@@ -47,7 +59,7 @@ def train_fcn(max_epoch=40, batch_size=6, lr=3e-4):
     return train_model(data_module, model, name, max_epoch)
 
 
-def train_unet(max_epoch=40, batch_size=32, lr=3e-4):
+def train_unet(max_epoch=100, batch_size=32, lr=3e-4):
     data_module = KvasirSEGDataModule(batch_size=batch_size)
     model = ModelUNet(lr=lr)
 
@@ -56,7 +68,7 @@ def train_unet(max_epoch=40, batch_size=32, lr=3e-4):
     return train_model(data_module, model, name, max_epoch)
 
 
-def train_tri_unet(max_epoch=40, batch_size=16, lr=3e-4):
+def train_tri_unet(max_epoch=100, batch_size=10, lr=3e-4):
     data_module = KvasirSEGDataModule(batch_size=batch_size)
     model = ModelTriUNet(lr=lr)
 
@@ -65,9 +77,9 @@ def train_tri_unet(max_epoch=40, batch_size=16, lr=3e-4):
     return train_model(data_module, model, name, max_epoch)
 
 
-def train_ensemble(max_epoch=40, batch_size=5, lr=3e-4):
+def train_ensemble(model_fcn=None, model_unet=None, model_tri_unet=None, max_epoch=100, batch_size=5, lr=3e-4):
     data_module = KvasirSEGDataModule(batch_size=batch_size)
-    model = ModelEnsemble(lr=lr)
+    model = ModelEnsemble(fcn=model_fcn, unet=model_unet, tri_unet=model_tri_unet, lr=lr)
 
     name = f"ensemble_{datetime.datetime.now().strftime('%y%m%d%H%M')}"
 

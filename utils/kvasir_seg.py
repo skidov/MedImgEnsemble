@@ -20,10 +20,10 @@ def load_model(name):
         return ModelBaseline.load_from_checkpoint(checkpoint_path=f"trained_models/{name}.ckpt")
     if "fcn_" in name:
         return ModelFCN.load_from_checkpoint(checkpoint_path=f"trained_models/{name}.ckpt")
-    if "unet_" in name:
-        return ModelUNet.load_from_checkpoint(checkpoint_path=f"trained_models/{name}.ckpt")
     if "tri_unet_" in name:
         return ModelTriUNet.load_from_checkpoint(checkpoint_path=f"trained_models/{name}.ckpt")
+    if "unet_" in name:
+        return ModelUNet.load_from_checkpoint(checkpoint_path=f"trained_models/{name}.ckpt")
     if "ensemble_" in name:
         return ModelEnsemble.load_from_checkpoint(checkpoint_path=f"trained_models/{name}.ckpt")
 
@@ -32,7 +32,7 @@ def show_masked_img(dataset, rows):
     ## Figure
     fig = plt.figure(figsize=(9, 3 * rows))
     plt.axis("off")
-    plt.title("Masked Image", fontweight="bold", fontsize=18, y=1.1)
+    plt.title("Kvasir-SEG", fontweight="bold", fontsize=18, y=1.1)
 
     for i_row in range(rows):
         i_image = random.randrange(0, len(dataset))

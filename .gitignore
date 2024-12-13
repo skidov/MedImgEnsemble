@@ -162,7 +162,8 @@ cython_debug/
 Kvasir-SEG/
 kvasir-seg.zip
 
-trained_models/
+trained_models/*
+
 lightning_logs/
 wandb/
 kvasir_segmentation/

@@ -3,29 +3,38 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from model.model_fcn import ModelFCN
+from model.model_tri_unet import ModelTriUNet
+from model.model_unet import ModelUNet
 from utils.metrics import DiceLoss
 
 
-class ModelBaseline(L.LightningModule):
-    def __init__(self, lr=3e-4):
+class ModelEnsemble(L.LightningModule):
+    def __init__(self, fcn=None, unet=None, tri_unet=None, lr=3e-4):
         super().__init__()
         self.lr = lr
 
-        self.conv_block = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3, stride=1, padding=1),
-            nn.Sigmoid(),
-        )
+        if fcn is None:
+            self.fcn = ModelFCN()
+        else:
+            self.fcn = fcn
+        if unet is None:
+            self.unet = ModelUNet()
+        else:
+            self.unet = unet
+        if tri_unet is None:
+            self.tri_unet = ModelTriUNet()
+        else:
+            self.tri_unet = tri_unet
 
         self.criterion = DiceLoss()
 
     def forward(self, x):
-        out = self.conv_block(x)
+        x1 = self.fcn(x)
+        x2 = self.unet(x)
+        x3 = self.tri_unet(x)
+
+        out = torch.mean(torch.stack((x1, x2, x3)), dim=0)
         return out
 
     def training_step(self, batch, batch_idx):

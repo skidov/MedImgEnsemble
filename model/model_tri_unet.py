@@ -3,29 +3,27 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from model.model_unet import ModelUNet
 from utils.metrics import DiceLoss
 
 
-class ModelBaseline(L.LightningModule):
+class ModelTriUNet(L.LightningModule):
     def __init__(self, lr=3e-4):
         super().__init__()
         self.lr = lr
 
-        self.conv_block = nn.Sequential(
-            nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=1),
-            nn.ReLU(),
-            nn.Conv2d(in_channels=3, out_channels=1, kernel_size=3, stride=1, padding=1),
-            nn.Sigmoid(),
-        )
+        self.unet1 = ModelUNet()
+        self.unet2 = ModelUNet()
+        self.unet3 = ModelUNet(in_channels=2)
 
         self.criterion = DiceLoss()
 
     def forward(self, x):
-        out = self.conv_block(x)
+        x1 = self.unet1(x)
+        x2 = self.unet2(x)
+
+        x = torch.cat((x1, x2), 1)
+        out = self.unet3(x)
         return out
 
     def training_step(self, batch, batch_idx):

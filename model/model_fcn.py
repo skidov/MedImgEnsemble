@@ -2,9 +2,8 @@ import lightning as L
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torchmetrics.segmentation import DiceScore
 
-from model.metrics import DiceLoss
+from utils.metrics import DiceLoss
 
 
 class ModelFCN(L.LightningModule):
@@ -39,7 +38,6 @@ class ModelFCN(L.LightningModule):
         )
 
         self.criterion = DiceLoss()
-        self.dice = DiceScore(num_classes=2)
 
     def forward(self, x):
         x = self.layer_0(x)
